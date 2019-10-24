@@ -55,6 +55,7 @@ You'll also find in the folder 2 .csv files (outputs of the code once run):
 
 ## Next steps
 
+- Improve current visualizations and develop new ones in Tableau
 - Shift from .csv files to BigQuery tables to store bike information
 - Add bike information on the map
 - Add Villo! real-time data on the map
