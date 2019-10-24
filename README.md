@@ -1,0 +1,35 @@
+# mobility_in_brussels
+
+## Introduction
+The goal of this project is to get Brussels mobility data that are available to the public.
+
+Ultimately, we want to display traffic data as well as other mobility data on a dynamic map of Brussels. 
+You can check the latest version of our map on our [Tableau Public link](https://public.tableau.com/profile/remy2092#!/vizhome/TrafficinBrussels/TrafficinBrussels).
+
+For the moment, we only have snapshots of real-time data that were extracted at certain points in time.
+
+## Brussels open datastore
+
+### Traffic counts api
+
+On several locations in the Brussels Region, traffic is measured using magnetic loops or cameras. To access this data, we can use the API or the geowebservices. For the moment, only real-time data is available, historical data is coming.
+
+In this project, we use the API. For more information on the latter, please visit the [Brussels open datastore documentation](https://data-mobility.brussels/traffic/api/counts/).
+
+In the `Traffic counts api` folder, you'll find a Jupyter Notebook detailing how to get the latest livestream data (the last 1-min interval available) for all detectors by traverse or by lane each time the code is run. We're going to extract, among other things, the number of vehicules passed between start and end time as well as the average speed of those counted vehicules.
+
+You'll also find in the folder 2 .csv files (outputs of the code once run):
+- `traverse_devices.csv`: the details of each device (magnetic loop or camera) such as name, longitude, latitude, etc.
+- `traverse_live.csv`: the traffic data measured by all devices at several points in time such as the number of vehicules passed during the 1-min interval, the average speed of those counted vehicules, etc.
+
+### Bike counts api
+
+The number of bikers are counted on several locations in the Brussels Region. The number of counters will be extended in the next years. To access the data, we can use the API or the geowebservices. Real time and historical data are available.
+
+In this project, we use the API. For more information on the latter, please visit the [Brussels open datastore documentation](https://data-mobility.brussels/bike/api/counts/).
+
+In the `Bike counts api` folder, you'll find a Jupyter Notebook detailing how to get the latest livestream data for all bike counting poles each time the code is run. We're going to extract the livestream count with the number of bikers passed last hour, day and year. The counts are only updated when a bike passes the sensor.
+
+You'll also find in the folder 2 .csv files (outputs of the code once run):
+- `pole_devices.csv`: the details of each bike counting pole such as name, longitude, latitude, etc.
+- `pole_live.csv`: the information captured by all bike counting poles at several points in time such as the number of bikers passed last hour, etc.
