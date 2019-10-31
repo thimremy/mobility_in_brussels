@@ -4,7 +4,7 @@
 The goal of this project is to get Brussels mobility data that are available to the public.
 
 Ultimately, we want to display traffic data as well as other mobility data on a dynamic map of Brussels. 
-You can check the latest version of our map on our [Tableau Online link](https://eu-west-1a.online.tableau.com/t/thimremy/views/TrafficinBrussels/TrafficinBrussels?iframeSizedToWindow=true&:embed=y&:showAppBanner=false&:display_count=no&:showVizHome=no&:origin=viz_share_link) (a new link with hourly refreshed map will be published soon)
+You can check the latest version of our map on our [Tableau Online link](https://eu-west-1a.online.tableau.com/t/thimremy/views/TrafficinBrussels/TrafficinBrussels?iframeSizedToWindow=true&:embed=y&:showAppBanner=false&:display_count=no&:showVizHome=no&:origin=viz_share_link) (a new link with hourly refreshed map will be published soon).
 
 For the moment, we only have snapshots of real-time data that were extracted at certain points in time.
 
