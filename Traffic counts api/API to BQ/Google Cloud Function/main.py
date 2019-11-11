@@ -7,8 +7,13 @@ import pandas_gbq
 
 # General remark: the functions detailed in this script can be improved to limit redundancies. It will be undertaken in a next step.
 
-# Below function will get device data (name, location, etc. of the traverses and their detectors by lane) and create an json object to store it.
 def get_device_data():
+    """
+    This function requests the device data (name, location, etc. of the traverses and their detectors by lane) and
+    creates a json object to store it.
+
+    :return: a Json object based on the response from "http://data-mobility.brussels/traffic/api/counts/?request=devices"
+    """
     traverse_devices_response = requests.get("http://data-mobility.brussels/traffic/api/counts/?request=devices")
     traverse_devices_status_code = traverse_devices_response.status_code
     traverse_devices_content = traverse_devices_response.content
@@ -59,10 +64,21 @@ def doesTableExist(project_id, dataset_id, table_id):
 def device_json_to_df():
     json_traverse_devices_content = get_device_data()
     
-    traverse_devices_df = pd.DataFrame(columns = ["traverse_request_date", "traverse_id", "traverse_name", "traverse_descr_nl", 
-                                              "traverse_descr_fr", "traverse_descr_en", "traverse_longitude", 
-                                              "traverse_latitude", "traverse_orientation", "traverse_number_of_lanes", 
-                                              "detector_1", "detector_2", "detector_3", "detector_4", "detector_5"])
+    traverse_devices_df = pd.DataFrame(columns = ["traverse_request_date",
+                                                  "traverse_id",
+                                                  "traverse_name",
+                                                  "traverse_descr_nl",
+                                                  "traverse_descr_fr",
+                                                  "traverse_descr_en",
+                                                  "traverse_longitude",
+                                                  "traverse_latitude",
+                                                  "traverse_orientation",
+                                                  "traverse_number_of_lanes",
+                                                  "detector_1",
+                                                  "detector_2",
+                                                  "detector_3",
+                                                  "detector_4",
+                                                  "detector_5"])
     
     traverse_request_date = json_traverse_devices_content["requestDate"]
     i = 0
@@ -83,10 +99,21 @@ def device_json_to_df():
         for detector in item["properties"]["detectors"]:
             detector_dict[detector_list[det_count]] = detector
             det_count += 1
-        traverse_devices_df.loc[i] = [traverse_request_date, traverse_id, traverse_name, traverse_descr_nl, traverse_descr_fr, 
-                                      traverse_descr_en, traverse_longitude, traverse_latitude, traverse_orientation, 
-                                      traverse_number_of_lanes, detector_dict["detector_1"], detector_dict["detector_2"], 
-                                      detector_dict["detector_3"], detector_dict["detector_4"], detector_dict["detector_5"]]  
+        traverse_devices_df.loc[i] = [traverse_request_date,
+                                      traverse_id,
+                                      traverse_name,
+                                      traverse_descr_nl,
+                                      traverse_descr_fr,
+                                      traverse_descr_en,
+                                      traverse_longitude,
+                                      traverse_latitude,
+                                      traverse_orientation,
+                                      traverse_number_of_lanes,
+                                      detector_dict["detector_1"],
+                                      detector_dict["detector_2"],
+                                      detector_dict["detector_3"],
+                                      detector_dict["detector_4"],
+                                      detector_dict["detector_5"]]
         i += 1
         
     coordinates = ["traverse_longitude", "traverse_latitude"]
