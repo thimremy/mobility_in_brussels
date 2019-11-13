@@ -7,8 +7,13 @@ import pandas_gbq
 
 # General remark: the functions detailed in this script can be improved to limit redundancies. It will be undertaken in a next step.
 
-# Below function will get device data (name, location, etc. of the traverses and their detectors by lane) and create an json object to store it.
 def get_device_data():
+    """
+    This function requests all the devices data (name, location, etc. of the traverses and their detectors by lane)
+    and creates a json object with the information stored in it.
+
+    :return: a Json object based on the response from "http://data-mobility.brussels/traffic/api/counts/?request=devices"
+    """
     traverse_devices_response = requests.get("http://data-mobility.brussels/traffic/api/counts/?request=devices")
     traverse_devices_status_code = traverse_devices_response.status_code
     traverse_devices_content = traverse_devices_response.content
@@ -17,8 +22,12 @@ def get_device_data():
     
     return json_traverse_devices_content
 
-# Below function extracts the real-time data off all the traverse and create an json object to store it. 
 def get_live_data():
+    """
+    This function extracts the real-time data off all the traverse and creates a Json object to store it.
+
+    :return: a Json object based on the response from "http://data-mobility.brussels/traffic/api/counts/"
+    """
     parameters = {'request': 'live', 'interval': '1', 'singleValue': 'true'}
     traverse_live_response = requests.get("http://data-mobility.brussels/traffic/api/counts/", params=parameters)
     traverse_live_status_code = traverse_live_response.status_code
@@ -39,8 +48,15 @@ def get_traverse_name():
     
     return list_of_traverse_name
 
-# Function to check if a BigQuery table already exists or not.
-def doesTableExist(project_id, dataset_id, table_id):
+def does_table_exist(project_id, dataset_id, table_id):
+    """
+    Function to check if a BigQuery table already exists or not.
+
+    :param project_id: the project id to be checked
+    :param dataset_id: the dataset id to be checked
+    :param table_id: the table id to be checked
+    :return: a Boolean value, true if the table exists
+    """
     bigquery_client = bigquery.Client(project_id)
     dataset_ref = bigquery_client.dataset(dataset_id)
     table_ref = dataset_ref.table(table_id)
@@ -55,14 +71,28 @@ def doesTableExist(project_id, dataset_id, table_id):
         print("Whoops! Table {} doesn\'t exist here! Ref: {}".format(table_ref, error))
         return False
 
-# Below function extract the device data from a json object and store them in a DataFrame.
-def device_json_to_df():
-    json_traverse_devices_content = get_device_data()
-    
-    traverse_devices_df = pd.DataFrame(columns = ["traverse_request_date", "traverse_id", "traverse_name", "traverse_descr_nl", 
-                                              "traverse_descr_fr", "traverse_descr_en", "traverse_longitude", 
-                                              "traverse_latitude", "traverse_orientation", "traverse_number_of_lanes", 
-                                              "detector_1", "detector_2", "detector_3", "detector_4", "detector_5"])
+def device_json_to_df(json_traverse_devices_content):
+    """
+    This function is responsible for generating DataFrame objects for all devices tracking traffic.
+
+    :param json_traverse_devices_content: the Json object containing the traffic tracking devices and their characteristics
+    :return: a Dataframe object of the data provided initially in input
+    """
+    traverse_devices_df = pd.DataFrame(columns = ["traverse_request_date",
+                                                  "traverse_id",
+                                                  "traverse_name",
+                                                  "traverse_descr_nl",
+                                                  "traverse_descr_fr",
+                                                  "traverse_descr_en",
+                                                  "traverse_longitude",
+                                                  "traverse_latitude",
+                                                  "traverse_orientation",
+                                                  "traverse_number_of_lanes",
+                                                  "detector_1",
+                                                  "detector_2",
+                                                  "detector_3",
+                                                  "detector_4",
+                                                  "detector_5"])
     
     traverse_request_date = json_traverse_devices_content["requestDate"]
     i = 0
@@ -83,10 +113,21 @@ def device_json_to_df():
         for detector in item["properties"]["detectors"]:
             detector_dict[detector_list[det_count]] = detector
             det_count += 1
-        traverse_devices_df.loc[i] = [traverse_request_date, traverse_id, traverse_name, traverse_descr_nl, traverse_descr_fr, 
-                                      traverse_descr_en, traverse_longitude, traverse_latitude, traverse_orientation, 
-                                      traverse_number_of_lanes, detector_dict["detector_1"], detector_dict["detector_2"], 
-                                      detector_dict["detector_3"], detector_dict["detector_4"], detector_dict["detector_5"]]  
+        traverse_devices_df.loc[i] = [traverse_request_date,
+                                      traverse_id,
+                                      traverse_name,
+                                      traverse_descr_nl,
+                                      traverse_descr_fr,
+                                      traverse_descr_en,
+                                      traverse_longitude,
+                                      traverse_latitude,
+                                      traverse_orientation,
+                                      traverse_number_of_lanes,
+                                      detector_dict["detector_1"],
+                                      detector_dict["detector_2"],
+                                      detector_dict["detector_3"],
+                                      detector_dict["detector_4"],
+                                      detector_dict["detector_5"]]
         i += 1
         
     coordinates = ["traverse_longitude", "traverse_latitude"]
@@ -102,13 +143,24 @@ def device_json_to_df():
     
     return traverse_devices_df
 
-# Below function extract the latest livestream data from a json object and store them in a DataFrame.
 def live_json_to_df():
+    """
+    This function is responsible for extracting the latest livestreamed data from the API, formatted as a json object
+     and store it in a DataFrame.
+
+    :return:
+    """
     json_traverse_live_content = get_live_data()
     list_of_traverse_name = get_traverse_name()
     
-    traverse_live_df = pd.DataFrame(columns = ['traverse_live_request_date', 'traverse_name', 'traverse_interval', 'traverse_count', 
-                                           'traverse_speed', 'traverse_occupancy','traverse_start_time', 'traverse_end_time'])
+    traverse_live_df = pd.DataFrame(columns = ['traverse_live_request_date',
+                                               'traverse_name',
+                                               'traverse_interval',
+                                               'traverse_count',
+                                               'traverse_speed',
+                                               'traverse_occupancy',
+                                               'traverse_start_time',
+                                               'traverse_end_time'])
     
     traverse_live_request_date = json_traverse_live_content["requestDate"]
     traverse_interval = '1m'
@@ -121,8 +173,14 @@ def live_json_to_df():
         traverse_start_time = json_traverse_live_content["data"][col]["results"][traverse_interval]["start_time"]
         traverse_end_time = json_traverse_live_content["data"][col]["results"][traverse_interval]["end_time"]
 
-        traverse_live_df.loc[i] = [traverse_live_request_date, traverse_name, traverse_interval, traverse_count, traverse_speed, 
-                                   traverse_occupancy, traverse_start_time, traverse_end_time]
+        traverse_live_df.loc[i] = [traverse_live_request_date,
+                                   traverse_name,
+                                   traverse_interval,
+                                   traverse_count,
+                                   traverse_speed,
+                                   traverse_occupancy,
+                                   traverse_start_time,
+                                   traverse_end_time]
         i += 1
 
     traverse_live_df.dropna(inplace = True)
@@ -138,18 +196,25 @@ def live_json_to_df():
 
     return traverse_live_df
 
-# Below function overwrites the existing device table if detectors are added.
 def device_df_to_gbq():
-    traverse_devices_df = device_json_to_df()
+    """
+    This function is responsible for returning a Google BigQuery object of all the data related to devices tracking
+    Brussels' traffic. The function first verifies that the table doesn't already exist. If it doesn't, we shall create
+    it. If it does, then it shall check if the dimension of the data has changed. If the dimension changed, we replace
+    the existing entries by the newest retrieved value.
+
+    :return: a gbq object of all the traffic tracking devices in Brussels
+    """
+    traverse_devices_df = device_json_to_df(get_device_data())
     
-    # TO DO: uncomment the below line and define where to store your table.
+    # TO DO: uncomment the below lines and define where to store your table.
 	
 	# project_id = ""
 	# dataset_id = ""
 	# table_id = ""
 	dataset_table_id = dataset_id + "." + table_id
 
-	if not doesTableExist(project_id,dataset_id,table_id):
+	if not does_table_exist(project_id, dataset_id, table_id):
 		try:
 			pandas_gbq.to_gbq(traverse_devices_df, dataset_table_id, project_id=project_id, if_exists='fail')
 		except:
@@ -170,7 +235,7 @@ def live_df_to_gbq():
 	# table_id = ""
 	dataset_table_id = dataset_id + "." + table_id
 
-	if not doesTableExist(project_id,dataset_id,table_id):
+	if not does_table_exist(project_id, dataset_id, table_id):
 		try:
 			pandas_gbq.to_gbq(traverse_live_df, dataset_table_id, project_id=project_id, if_exists='fail')
 		except:
