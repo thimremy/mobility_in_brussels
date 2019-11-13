@@ -19,7 +19,7 @@ In this project, we use the API. For more information on the latter, please visi
 In the `Traffic counts api` folder, you'll find 
 
 - the `API to CSV` folder explaining how to extract data via the public API and store them in .csv files. The folder contains:
-    - a Jupyter Notebook detailing how to get the latest livestream data (the last 1-min interval available) for all detectors by   traverse or by lane each time the code is run. We're going to extract, among other things, the number of vehicules passed between start and end time as well as the average speed of those counted vehicules.
+    - a Jupyter Notebook detailing how to get the latest livestream data (the last 1-min interval available) for all detectors by traverse or by lane each time the code is run. We're going to extract, among other things, the number of vehicules passed between start and end time as well as the average speed of those counted vehicules.
     - 2 .csv files (outputs of the code once run):
       - `traverse_devices.csv`: the details of each device (magnetic loop or camera) such as name, longitude, latitude, etc.
       - `traverse_live.csv`: the traffic data measured by all devices at several points in time such as the number of vehicules passed during the 1-min interval, the average speed of those counted vehicules, etc.
@@ -45,8 +45,8 @@ You'll also find in the folder 2 .csv files (outputs of the code once run):
 
 ### Use of Google Scheduler and Google Cloud Function
 
-1. In order to update our BigQuery tables every minute, we used defined a Google Cloud Function (cfr. `main.py` script) that will add livestream traffic data to our BigQuery tables each time  it is run.
-2. We then used Google Cloud Scheduler to schedule the function to be run every minute.
+1. In order to update our BigQuery tables every minute, we defined a Google Cloud Function (cfr. `main.py` script) that will add livestream traffic data to our BigQuery tables each time it is triggered.
+2. We then used Google Cloud Scheduler to schedule the function to be ran every minute.
 
 ### Link with Tableau
 
