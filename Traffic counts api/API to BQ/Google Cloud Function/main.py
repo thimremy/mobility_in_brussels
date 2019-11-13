@@ -8,7 +8,8 @@ import pandas_gbq
 # General remark: the functions detailed in this script can be improved to limit redundancies. It will be undertaken in a next step.
 
 def get_device_data():
-    """This function requests all the devices data (name, location, etc. of the traverses and their detectors by lane)
+    """
+    This function requests all the devices data (name, location, etc. of the traverses and their detectors by lane)
     and creates a json object with the information stored in it.
 
     :return: a Json object based on the response from "http://data-mobility.brussels/traffic/api/counts/?request=devices"
@@ -21,9 +22,9 @@ def get_device_data():
     
     return json_traverse_devices_content
 
-
 def get_live_data():
-    """This function extracts the real-time data off all the traverse and creates a Json object to store it.
+    """
+    This function extracts the real-time data off all the traverse and creates a Json object to store it.
 
     :return: a Json object based on the response from "http://data-mobility.brussels/traffic/api/counts/"
     """
@@ -47,9 +48,9 @@ def get_traverse_name():
     
     return list_of_traverse_name
 
-
 def does_table_exist(project_id, dataset_id, table_id):
-    """Function to check if a BigQuery table already exists or not.
+    """
+    Function to check if a BigQuery table already exists or not.
 
     :param project_id: the project id to be checked
     :param dataset_id: the dataset id to be checked
@@ -70,10 +71,9 @@ def does_table_exist(project_id, dataset_id, table_id):
         print("Whoops! Table {} doesn\'t exist here! Ref: {}".format(table_ref, error))
         return False
 
-
-
 def device_json_to_df(json_traverse_devices_content):
-    """This function is responsible for generating DataFrame objects for all devices tracking traffic.
+    """
+    This function is responsible for generating DataFrame objects for all devices tracking traffic.
 
     :param json_traverse_devices_content: the Json object containing the traffic tracking devices and their characteristics
     :return: a Dataframe object of the data provided initially in input
@@ -143,9 +143,9 @@ def device_json_to_df(json_traverse_devices_content):
     
     return traverse_devices_df
 
-
 def live_json_to_df():
-    """This function is responsible for extracting the latest livestreamed data from the API, formatted as a json object
+    """
+    This function is responsible for extracting the latest livestreamed data from the API, formatted as a json object
      and store it in a DataFrame.
 
     :return:
@@ -196,9 +196,9 @@ def live_json_to_df():
 
     return traverse_live_df
 
-
 def device_df_to_gbq():
-    """This function is responsible for returning a Google BigQuery object of all the data related to devices tracking
+    """
+    This function is responsible for returning a Google BigQuery object of all the data related to devices tracking
     Brussels' traffic. The function first verifies that the table doesn't already exist. If it doesn't, we shall create
     it. If it does, then it shall check if the dimension of the data has changed. If the dimension changed, we replace
     the existing entries by the newest retrieved value.
@@ -207,7 +207,7 @@ def device_df_to_gbq():
     """
     traverse_devices_df = device_json_to_df(get_device_data())
     
-    # TO DO: uncomment the below line and define where to store your table.
+    # TO DO: uncomment the below lines and define where to store your table.
 	
 	# project_id = ""
 	# dataset_id = ""
@@ -254,6 +254,6 @@ def live_df_to_gbq():
 		pandas_gbq.to_gbq(traverse_live_df, dataset_table_id, project_id=project_id, if_exists='append')
 
 # This function when triggered starts the whole process of updating Brussels traffic data.
-def final():
+def final(request):
     device_df_to_gbq()
     live_df_to_gbq()
